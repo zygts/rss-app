@@ -82,8 +82,6 @@ suficiente para 10-20 fuentes RSS personales. Las bases de datos inactivas
 un periodo de inactividad puede tardar un poco más (medio segundo o así)
 en responder — algo normal y sin impacto real en este proyecto.
 
-## Connection string
-postgresql://neondb_owner:npg_HGsYT4Ib2jOJ@ep-solitary-violet-abi1q8ab.eu-west-2.aws.neon.tech/neondb?sslmode=require# rss-app
 # rss-app
 # rss-app
 # rss-app
