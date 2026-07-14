@@ -1,0 +1,10 @@
+{
+  "name": "rss-agregador",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Agregador RSS personalizado (solo fuentes con RSS nativo)",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.1",
+    "rss-parser": "^3.13.0"
+  }
+}
