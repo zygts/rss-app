@@ -26,6 +26,10 @@ function escaparTexto(texto) {
   return div.innerHTML;
 }
 
+function escaparAtributo(texto) {
+  return (texto || '').replace(/"/g, '&quot;');
+}
+
 function pintarPosts(posts, { reemplazar }) {
   if (reemplazar) postsAcumulados = posts;
   else postsAcumulados = postsAcumulados.concat(posts);
@@ -37,6 +41,7 @@ function pintarPosts(posts, { reemplazar }) {
 
   lista.innerHTML = postsAcumulados.map((post) => `
     <article class="post ${post.leido ? 'leido' : ''}" data-id="${post.id}">
+      ${post.imagen_url ? `<img class="post-imagen" src="${escaparAtributo(post.imagen_url)}" alt="" loading="lazy" onerror="this.remove()" />` : ''}
       <div class="post-meta">
         <span>${escaparTexto(post.fuentes?.nombre || 'Fuente desconocida')}</span>
         <span>${formateaFecha(post.fecha_publicacion)}</span>

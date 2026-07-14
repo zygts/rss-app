@@ -1,11 +1,18 @@
 const { Pool } = require('@neondatabase/serverless');
 const Parser = require('rss-parser');
 const { limpiarResumen } = require('../lib/sanitize');
+const { extraerImagen } = require('../lib/imagen');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 const parser = new Parser({
   timeout: 8000, // no dejar que una fuente lenta bloquee a las demás
+  customFields: {
+    item: [
+      ['media:content', 'mediaContent'],
+      ['media:thumbnail', 'mediaThumbnail'],
+    ],
+  },
 });
 
 async function comprobarFuente(fuente) {
@@ -17,15 +24,16 @@ async function comprobarFuente(fuente) {
       url: item.link,
       fecha_publicacion: item.isoDate || item.pubDate || null,
       resumen: limpiarResumen((item.contentSnippet || item.summary || '').slice(0, 500)),
+      imagen_url: extraerImagen(item),
     }))
     .filter((p) => !!p.url);
 
   for (const post of posts) {
     await pool.query(
-      `insert into posts (fuente_id, titulo, url, fecha_publicacion, resumen)
-       values ($1, $2, $3, $4, $5)
+      `insert into posts (fuente_id, titulo, url, fecha_publicacion, resumen, imagen_url)
+       values ($1, $2, $3, $4, $5, $6)
        on conflict (fuente_id, url) do nothing`,
-      [fuente.id, post.titulo, post.url, post.fecha_publicacion, post.resumen]
+      [fuente.id, post.titulo, post.url, post.fecha_publicacion, post.resumen, post.imagen_url]
     );
   }
 

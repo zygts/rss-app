@@ -42,6 +42,26 @@ Puedes seguir añadiendo fuentes nuevas en cualquier momento, sin tocar código.
   pusiste `CRON_SECRET`, esa llamada manual dará 401 — es normal, solo el
   cron interno de Vercel puede llamarla con el secreto).
 
+## Imágenes de los posts
+
+`check-feeds.js` intenta extraer una imagen destacada de cada post (mirando
+primero el `<enclosure>` del feed, luego `<media:content>`/`<media:thumbnail>`,
+y como último recurso la primera `<img>` dentro del contenido del post). No
+todos los feeds la traen — cuando no hay imagen, la tarjeta se muestra igual,
+simplemente sin foto.
+
+**Si ya tenías el proyecto desplegado de antes**, la tabla `posts` no tiene
+la columna `imagen_url` todavía. Antes de volver a desplegar, ejecuta esto una
+vez en el SQL Editor de Neon:
+
+```sql
+alter table posts add column if not exists imagen_url text;
+```
+
+Los posts que ya tenías guardados se quedarán sin imagen (no se puede sacar
+a posteriori sin volver a leer el feed), pero los que se guarden a partir de
+ahora ya la traerán si el feed la ofrece.
+
 ## Estructura del proyecto
 
 ```
@@ -53,6 +73,7 @@ api/
   mark-all-read.js  → marca todos los posts (o los de una fuente) como leídos
 lib/
   sanitize.js       → limpia HTML suelto de los resúmenes de los feeds
+  imagen.js         → extrae la imagen destacada de cada post del feed
 public/
   index.html        → panel visual (filtros, aviso de fuentes, lista, cargar más)
   style.css

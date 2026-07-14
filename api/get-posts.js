@@ -33,6 +33,7 @@ module.exports = async (req, res) => {
         posts.url,
         posts.fecha_publicacion,
         posts.resumen,
+        posts.imagen_url,
         posts.leido,
         fuentes.nombre as fuente_nombre
       from posts
@@ -49,6 +50,7 @@ module.exports = async (req, res) => {
       url: row.url,
       fecha_publicacion: row.fecha_publicacion,
       resumen: limpiarResumen(row.resumen),
+      imagen_url: row.imagen_url,
       leido: row.leido,
       fuentes: { nombre: row.fuente_nombre },
     }));

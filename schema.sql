@@ -1,6 +1,10 @@
 -- Ejecuta esto en el SQL Editor de Neon (Project > SQL Editor), o con
 -- cualquier cliente Postgres (psql, TablePlus, etc.) conectado a tu base
 
+-- MIGRACIÓN: si ya tenías la tabla `posts` creada de antes (sin la columna
+-- imagen_url), ejecuta primero esta línea suelta antes del resto del script:
+-- alter table posts add column if not exists imagen_url text;
+
 create table if not exists fuentes (
   id bigint generated always as identity primary key,
   nombre text not null,
@@ -17,6 +21,7 @@ create table if not exists posts (
   url text not null,
   fecha_publicacion timestamptz,
   resumen text,
+  imagen_url text,
   leido boolean not null default false,
   creado_en timestamptz not null default now(),
   unique (fuente_id, url)
