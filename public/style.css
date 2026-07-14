@@ -61,8 +61,6 @@ button:hover { opacity: 0.9; }
 main {
   display: grid;
   gap: 1rem;
-  max-width: 800px;
-  margin: 0 auto;
 }
 
 .cargando, .vacio {
@@ -117,7 +115,7 @@ main {
 /* --- Sidebar de controles y aviso de fuentes --- */
 
 .controles {
-  width: 320px;
+  width: 220px;
   flex-shrink: 0;
   background: var(--card);
   border: 1px solid var(--border);
@@ -126,9 +124,8 @@ main {
   display: flex;
   flex-direction: column;
   gap: 1.25rem;
-  position: fixed;
-  top: 5.5rem;
-  left: 1rem;
+  position: sticky;
+  top: 1.5rem;
 }
 
 .controles-grupo {

@@ -42,6 +42,24 @@ Puedes seguir añadiendo fuentes nuevas en cualquier momento, sin tocar código.
   pusiste `CRON_SECRET`, esa llamada manual dará 401 — es normal, solo el
   cron interno de Vercel puede llamarla con el secreto).
 
+## Rellenar imágenes de posts ya guardados
+
+Si ya tenías posts guardados antes de añadir la columna `imagen_url`, puedes
+rellenarla para los que **todavía sigan apareciendo en el feed actual** de su
+fuente (los más antiguos, que ya hayan "salido" del feed, se quedarán sin
+imagen — esa información ya no está en ningún sitio).
+
+1. Despliega los cambios primero (asegúrate de haber ejecutado el `alter table`
+   de la sección anterior).
+2. Visita `https://tu-proyecto.vercel.app/api/backfill-imagenes` en el
+   navegador (si tienes `CRON_SECRET` puesto, tendrás que llamarlo con esa
+   cabecera en vez de desde el navegador directamente — por ejemplo con
+   `curl -H "Authorization: Bearer TU_CRON_SECRET" https://tu-proyecto.vercel.app/api/backfill-imagenes`).
+3. La respuesta te dice, fuente por fuente, cuántos posts se han actualizado.
+4. Es un endpoint de un solo uso — puedes volver a llamarlo cuando quieras
+   (no hace daño, simplemente no encontrará nada nuevo que rellenar salvo
+   que hayas añadido fuentes nuevas), pero no forma parte del cron diario.
+
 ## Imágenes de los posts
 
 `check-feeds.js` intenta extraer una imagen destacada de cada post (mirando
@@ -71,6 +89,7 @@ api/
   get-fuentes.js    → lista las fuentes para el desplegable de filtro + detecta fuentes con problemas
   mark-read.js      → marca un post como leído
   mark-all-read.js  → marca todos los posts (o los de una fuente) como leídos
+  backfill-imagenes.js → de un solo uso: rellena imagen_url en posts ya guardados que aún no la tengan
 lib/
   sanitize.js       → limpia HTML suelto de los resúmenes de los feeds
   imagen.js         → extrae la imagen destacada de cada post del feed
