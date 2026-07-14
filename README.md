@@ -46,16 +46,41 @@ Puedes seguir añadiendo fuentes nuevas en cualquier momento, sin tocar código.
 
 ```
 api/
-  check-feeds.js   → cron: recorre las fuentes, detecta posts nuevos, los guarda
-  get-posts.js     → sirve los posts guardados al panel
-  mark-read.js     → marca un post como leído
+  check-feeds.js    → cron: recorre las fuentes (en paralelo), detecta posts nuevos, los guarda
+  get-posts.js      → sirve los posts guardados al panel (con filtro por fuente, no-leídos y paginación)
+  get-fuentes.js    → lista las fuentes para el desplegable de filtro + detecta fuentes con problemas
+  mark-read.js      → marca un post como leído
+  mark-all-read.js  → marca todos los posts (o los de una fuente) como leídos
+lib/
+  sanitize.js       → limpia HTML suelto de los resúmenes de los feeds
 public/
-  index.html       → panel visual
+  index.html        → panel visual (filtros, aviso de fuentes, lista, cargar más)
   style.css
   app.js
 schema.sql          → esquema de la base de datos (Postgres, para Neon)
-vercel.json         → configuración del cron (cada hora)
+vercel.json         → configuración del cron (una vez al día)
 ```
+
+## Funcionalidades del panel
+
+- **Filtro por fuente**: desplegable con todas tus fuentes activas.
+- **"Solo no leídos"**: casilla para ocultar lo ya leído.
+- **"Marcar todos como leídos"**: aplica al filtro de fuente activo en ese momento (si no hay ninguna fuente seleccionada, marca todos).
+- **Cargar más**: pagina de 20 en 20 en vez de traer todo de golpe.
+- **Aviso de fuentes con problemas**: aparece automáticamente encima de la lista cuando:
+  - Una fuente lleva más de 2 días sin comprobarse con éxito (probable URL de feed rota o caída) — esto es posible porque `ultima_comprobacion` solo se actualiza cuando esa fuente en concreto se procesa sin error, así que un fallo silencioso queda reflejado aquí.
+  - Una fuente se comprueba bien pero lleva más de 21 días sin traer ningún post nuevo (aviso solo informativo, puede que ese sitio simplemente publique poco).
+
+## Sobre los resúmenes con HTML suelto
+
+Algunos feeds incluyen HTML dentro del resumen del post (negritas, enlaces,
+incluso etiquetas sueltas). `check-feeds.js` limpia esto antes de guardarlo,
+y `get-posts.js` lo vuelve a limpiar por si acaso al servirlo — además, el
+panel nunca inserta el resumen como HTML, siempre como texto plano. Si ya
+tenías posts guardados de antes con HTML suelto en el resumen, se limpiarán
+solos la próxima vez que `get-posts.js` los sirva (no hace falta borrar nada
+a mano).
+
 
 ## Ajustar la frecuencia
 

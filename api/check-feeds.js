@@ -1,5 +1,6 @@
 const { Pool } = require('@neondatabase/serverless');
 const Parser = require('rss-parser');
+const { limpiarResumen } = require('../lib/sanitize');
 
 const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
@@ -15,7 +16,7 @@ async function comprobarFuente(fuente) {
       titulo: item.title || '(sin título)',
       url: item.link,
       fecha_publicacion: item.isoDate || item.pubDate || null,
-      resumen: (item.contentSnippet || item.summary || '').slice(0, 500),
+      resumen: limpiarResumen((item.contentSnippet || item.summary || '').slice(0, 500)),
     }))
     .filter((p) => !!p.url);
 

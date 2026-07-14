@@ -12,9 +12,28 @@
     <button id="btn-refrescar">Actualizar</button>
   </header>
 
+  <div id="aviso-fuentes"></div>
+
+  <div class="controles">
+    <select id="filtro-fuente">
+      <option value="">Todas las fuentes</option>
+    </select>
+
+    <label class="checkbox-label">
+      <input type="checkbox" id="filtro-no-leidos" />
+      Solo no leídos
+    </label>
+
+    <button id="btn-marcar-todos" class="secundario">Marcar todos como leídos</button>
+  </div>
+
   <main id="lista-posts">
     <p class="cargando">Cargando novedades…</p>
   </main>
+
+  <div class="paginacion">
+    <button id="btn-cargar-mas" style="display:none;">Cargar más</button>
+  </div>
 
   <script src="app.js"></script>
 </body>

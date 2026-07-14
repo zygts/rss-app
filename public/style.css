@@ -100,3 +100,71 @@ main {
   padding: 0;
   font-size: 0.8rem;
 }
+
+/* --- Controles de filtro y aviso de fuentes --- */
+
+.controles {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  padding-top: 1rem;
+}
+
+.controles select {
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  border: 1px solid var(--border);
+  background: var(--card);
+  font-size: 0.9rem;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.9rem;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+button.secundario {
+  background: transparent;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  margin-left: auto;
+}
+
+#aviso-fuentes {
+  max-width: 720px;
+  margin: 1rem auto 0 auto;
+  padding: 0 1.5rem;
+}
+
+.aviso {
+  background: #fff7ed;
+  border: 1px solid #fdba74;
+  color: #9a3412;
+  border-radius: 8px;
+  padding: 0.75rem 1rem;
+  font-size: 0.85rem;
+  margin-bottom: 0.5rem;
+}
+
+.aviso strong { font-weight: 600; }
+
+.paginacion {
+  max-width: 720px;
+  margin: 0 auto;
+  padding: 0 1.5rem 2rem 1.5rem;
+  text-align: center;
+}
+
+.paginacion button {
+  background: var(--card);
+  color: var(--accent);
+  border: 1px solid var(--border);
+}
