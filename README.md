@@ -59,11 +59,13 @@ vercel.json         → configuración del cron (cada hora)
 
 ## Ajustar la frecuencia
 
-En `vercel.json`, cambia `"schedule": "0 * * * *"` por la expresión cron
-que prefieras (por ejemplo `"*/30 * * * *"` para cada 30 min). En el plan
-gratuito de Vercel, los cron jobs no pueden dispararse con más frecuencia
-que una vez al día en algunos casos de proyectos antiguos — comprueba en tu
-panel de Vercel qué frecuencia mínima permite tu plan actual.
+`vercel.json` está configurado con `"schedule": "0 8 * * *"` — una comprobación
+al día, a las 8:00 (hora UTC). Esto es porque el plan gratuito (Hobby) de
+Vercel limita los cron jobs a una ejecución diaria como máximo. Si en algún
+momento pasas a un plan de pago de Vercel, puedes cambiarlo a algo como
+`"0 * * * *"` (cada hora) sin tocar nada más del código — la función
+`check-feeds.js` ya comprueba todas las fuentes en paralelo, así que aguanta
+bien una frecuencia más alta.
 
 ## Fuentes que fallan
 
@@ -81,7 +83,3 @@ suficiente para 10-20 fuentes RSS personales. Las bases de datos inactivas
 "escalan a cero" tras un rato sin uso, así que la primera consulta tras
 un periodo de inactividad puede tardar un poco más (medio segundo o así)
 en responder — algo normal y sin impacto real en este proyecto.
-
-# rss-app
-# rss-app
-# rss-app

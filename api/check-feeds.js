@@ -7,6 +7,35 @@ const parser = new Parser({
   timeout: 8000, // no dejar que una fuente lenta bloquee a las demás
 });
 
+async function comprobarFuente(fuente) {
+  const feed = await parser.parseURL(fuente.url_feed);
+
+  const posts = (feed.items || [])
+    .map((item) => ({
+      titulo: item.title || '(sin título)',
+      url: item.link,
+      fecha_publicacion: item.isoDate || item.pubDate || null,
+      resumen: (item.contentSnippet || item.summary || '').slice(0, 500),
+    }))
+    .filter((p) => !!p.url);
+
+  for (const post of posts) {
+    await pool.query(
+      `insert into posts (fuente_id, titulo, url, fecha_publicacion, resumen)
+       values ($1, $2, $3, $4, $5)
+       on conflict (fuente_id, url) do nothing`,
+      [fuente.id, post.titulo, post.url, post.fecha_publicacion, post.resumen]
+    );
+  }
+
+  await pool.query(
+    'update fuentes set ultima_comprobacion = now() where id = $1',
+    [fuente.id]
+  );
+
+  return { fuente: fuente.nombre, posts_encontrados: posts.length, ok: true };
+}
+
 module.exports = async (req, res) => {
   // Protege el endpoint: si defines CRON_SECRET en Vercel, solo el propio
   // cron de Vercel (o alguien con el secreto) puede disparar esta función.
@@ -18,51 +47,23 @@ module.exports = async (req, res) => {
     }
   }
 
-  const client = await pool.connect();
-  const resultados = [];
+  const { rows: fuentes } = await pool.query(
+    'select id, nombre, url_feed from fuentes where activa = true'
+  );
 
-  try {
-    const { rows: fuentes } = await client.query(
-      'select id, nombre, url_feed from fuentes where activa = true'
-    );
+  // Se comprueban todas las fuentes EN PARALELO (no una detrás de otra),
+  // para que el tiempo total no dependa de cuántas fuentes tengas.
+  // Si una falla, no afecta a las demás (Promise.allSettled, no Promise.all).
+  const resultados = await Promise.allSettled(
+    fuentes.map((fuente) => comprobarFuente(fuente))
+  );
 
-    for (const fuente of fuentes) {
-      try {
-        const feed = await parser.parseURL(fuente.url_feed);
+  const resumen = resultados.map((resultado, i) => {
+    if (resultado.status === 'fulfilled') return resultado.value;
+    // Fallo silencioso hacia el usuario, pero lo dejamos registrado en la
+    // respuesta para poder detectar "esta fuente lleva tiempo sin funcionar"
+    return { fuente: fuentes[i].nombre, ok: false, error: resultado.reason.message };
+  });
 
-        const posts = (feed.items || [])
-          .map((item) => ({
-            titulo: item.title || '(sin título)',
-            url: item.link,
-            fecha_publicacion: item.isoDate || item.pubDate || null,
-            resumen: (item.contentSnippet || item.summary || '').slice(0, 500),
-          }))
-          .filter((p) => !!p.url);
-
-        for (const post of posts) {
-          await client.query(
-            `insert into posts (fuente_id, titulo, url, fecha_publicacion, resumen)
-             values ($1, $2, $3, $4, $5)
-             on conflict (fuente_id, url) do nothing`,
-            [fuente.id, post.titulo, post.url, post.fecha_publicacion, post.resumen]
-          );
-        }
-
-        await client.query(
-          'update fuentes set ultima_comprobacion = now() where id = $1',
-          [fuente.id]
-        );
-
-        resultados.push({ fuente: fuente.nombre, posts_encontrados: posts.length, ok: true });
-      } catch (err) {
-        // Fallo silencioso hacia el usuario, pero lo dejamos registrado en la
-        // respuesta para poder detectar "esta fuente lleva tiempo sin funcionar"
-        resultados.push({ fuente: fuente.nombre, ok: false, error: err.message });
-      }
-    }
-  } finally {
-    client.release();
-  }
-
-  res.status(200).json({ comprobado_en: new Date().toISOString(), resultados });
+  res.status(200).json({ comprobado_en: new Date().toISOString(), resultados: resumen });
 };
