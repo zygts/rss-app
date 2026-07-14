@@ -8,16 +8,21 @@ module.exports = async (req, res) => {
     return;
   }
 
-  const { fuente_id } = req.body || {};
+  const { fuente_id, leido } = req.body || {};
+
+  // Por defecto marca todos como leídos (comportamiento anterior); si se
+  // pasa leido: false, marca todos como no leídos.
+  const nuevoValor = leido === false ? false : true;
+  const valorActual = !nuevoValor; // busca los que están en el estado contrario
 
   try {
     if (fuente_id) {
       await pool.query(
-        'update posts set leido = true where leido = false and fuente_id = $1',
-        [fuente_id]
+        'update posts set leido = $2 where leido = $3 and fuente_id = $1',
+        [fuente_id, nuevoValor, valorActual]
       );
     } else {
-      await pool.query('update posts set leido = true where leido = false');
+      await pool.query('update posts set leido = $1 where leido = $2', [nuevoValor, valorActual]);
     }
 
     res.status(200).json({ ok: true });

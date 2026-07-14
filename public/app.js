@@ -3,6 +3,7 @@ const btnRefrescar = document.getElementById('btn-refrescar');
 const selectFuente = document.getElementById('filtro-fuente');
 const checkNoLeidos = document.getElementById('filtro-no-leidos');
 const btnMarcarTodos = document.getElementById('btn-marcar-todos');
+const btnDesmarcarTodos = document.getElementById('btn-desmarcar-todos');
 const btnCargarMas = document.getElementById('btn-cargar-mas');
 const avisoFuentes = document.getElementById('aviso-fuentes');
 
@@ -43,7 +44,9 @@ function pintarPosts(posts, { reemplazar }) {
       <h2><a href="${post.url}" target="_blank" rel="noopener">${escaparTexto(post.titulo)}</a></h2>
       ${post.resumen ? `<p>${escaparTexto(post.resumen)}</p>` : ''}
       <div class="post-acciones">
-        ${!post.leido ? `<button class="marcar-leido" data-id="${post.id}">Marcar como leído</button>` : ''}
+        ${!post.leido
+          ? `<button class="marcar-leido" data-id="${post.id}">Marcar como leído</button>`
+          : `<button class="marcar-no-leido" data-id="${post.id}">Marcar como no leído</button>`}
       </div>
     </article>
   `).join('');
@@ -54,7 +57,19 @@ function pintarPosts(posts, { reemplazar }) {
       await fetch('/api/mark-read', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id, leido: true }),
+      });
+      cargarPosts({ reiniciar: true });
+    });
+  });
+
+  document.querySelectorAll('.marcar-no-leido').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      await fetch('/api/mark-read', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, leido: false }),
       });
       cargarPosts({ reiniciar: true });
     });
@@ -121,7 +136,17 @@ checkNoLeidos.addEventListener('change', () => cargarPosts({ reiniciar: true }))
 btnCargarMas.addEventListener('click', () => cargarPosts({ reiniciar: false }));
 
 btnMarcarTodos.addEventListener('click', async () => {
-  const body = selectFuente.value ? { fuente_id: selectFuente.value } : {};
+  const body = selectFuente.value ? { fuente_id: selectFuente.value, leido: true } : { leido: true };
+  await fetch('/api/mark-all-read', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+  });
+  cargarPosts({ reiniciar: true });
+});
+
+btnDesmarcarTodos.addEventListener('click', async () => {
+  const body = selectFuente.value ? { fuente_id: selectFuente.value, leido: false } : { leido: false };
   await fetch('/api/mark-all-read', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },

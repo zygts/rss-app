@@ -131,11 +131,17 @@ main {
   cursor: pointer;
 }
 
+.grupo-marcar-todos {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: auto;
+  flex-wrap: wrap;
+}
+
 button.secundario {
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--accent);
-  margin-left: auto;
 }
 
 #aviso-fuentes {
