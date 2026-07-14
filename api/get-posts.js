@@ -5,7 +5,7 @@ const pool = new Pool({ connectionString: process.env.DATABASE_URL });
 
 module.exports = async (req, res) => {
   try {
-    const { fuente_id, no_leidos, offset, limit } = req.query || {};
+    const { fuente_id, no_leidos, solo_favoritos, offset, limit } = req.query || {};
 
     const limiteNum = Math.min(parseInt(limit, 10) || 20, 100);
     const offsetNum = parseInt(offset, 10) || 0;
@@ -22,6 +22,10 @@ module.exports = async (req, res) => {
       condiciones.push('posts.leido = false');
     }
 
+    if (solo_favoritos === 'true') {
+      condiciones.push('posts.favorito = true');
+    }
+
     const whereSql = condiciones.length ? `where ${condiciones.join(' and ')}` : '';
 
     valores.push(limiteNum, offsetNum);
@@ -35,6 +39,7 @@ module.exports = async (req, res) => {
         posts.resumen,
         posts.imagen_url,
         posts.leido,
+        posts.favorito,
         fuentes.nombre as fuente_nombre
       from posts
       join fuentes on fuentes.id = posts.fuente_id
@@ -52,6 +57,7 @@ module.exports = async (req, res) => {
       resumen: limpiarResumen(row.resumen),
       imagen_url: row.imagen_url,
       leido: row.leido,
+      favorito: row.favorito,
       fuentes: { nombre: row.fuente_nombre },
     }));
 

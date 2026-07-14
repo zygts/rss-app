@@ -92,6 +92,29 @@ main {
 .post h2 {
   font-size: 1.05rem;
   margin: 0 0 0.4rem 0;
+  display: flex;
+  align-items: baseline;
+  gap: 0.4rem;
+}
+
+.btn-favorito {
+  background: transparent;
+  border: none;
+  padding: 0;
+  font-size: 1.1rem;
+  line-height: 1;
+  color: var(--border);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.btn-favorito.activo {
+  color: #f59e0b;
+}
+
+.btn-favorito:hover {
+  color: #f59e0b;
+  opacity: 1;
 }
 
 .post h2 a {

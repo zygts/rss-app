@@ -2,6 +2,7 @@ const lista = document.getElementById('lista-posts');
 const btnRefrescar = document.getElementById('btn-refrescar');
 const selectFuente = document.getElementById('filtro-fuente');
 const checkNoLeidos = document.getElementById('filtro-no-leidos');
+const checkFavoritos = document.getElementById('filtro-favoritos');
 const btnMarcarTodos = document.getElementById('btn-marcar-todos');
 const btnDesmarcarTodos = document.getElementById('btn-desmarcar-todos');
 const btnCargarMas = document.getElementById('btn-cargar-mas');
@@ -46,7 +47,10 @@ function pintarPosts(posts, { reemplazar }) {
         <span>${escaparTexto(post.fuentes?.nombre || 'Fuente desconocida')}</span>
         <span>${formateaFecha(post.fecha_publicacion)}</span>
       </div>
-      <h2><a href="${post.url}" target="_blank" rel="noopener">${escaparTexto(post.titulo)}</a></h2>
+      <h2>
+        <button class="btn-favorito ${post.favorito ? 'activo' : ''}" data-id="${post.id}" data-favorito="${post.favorito}" title="${post.favorito ? 'Quitar de favoritos' : 'Añadir a favoritos'}">★</button>
+        <a href="${post.url}" target="_blank" rel="noopener">${escaparTexto(post.titulo)}</a>
+      </h2>
       ${post.resumen ? `<p>${escaparTexto(post.resumen)}</p>` : ''}
       <div class="post-acciones">
         ${!post.leido
@@ -55,6 +59,19 @@ function pintarPosts(posts, { reemplazar }) {
       </div>
     </article>
   `).join('');
+
+  document.querySelectorAll('.btn-favorito').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const id = btn.dataset.id;
+      const esFavoritoAhora = btn.dataset.favorito === 'true';
+      await fetch('/api/mark-favorite', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id, favorito: !esFavoritoAhora }),
+      });
+      cargarPosts({ reiniciar: true });
+    });
+  });
 
   document.querySelectorAll('.marcar-leido').forEach((btn) => {
     btn.addEventListener('click', async () => {
@@ -85,6 +102,7 @@ function construirQuery(offset) {
   const params = new URLSearchParams();
   if (selectFuente.value) params.set('fuente_id', selectFuente.value);
   if (checkNoLeidos.checked) params.set('no_leidos', 'true');
+  if (checkFavoritos.checked) params.set('solo_favoritos', 'true');
   params.set('limit', LIMITE_POR_PAGINA);
   params.set('offset', offset);
   return params.toString();
@@ -137,6 +155,7 @@ btnRefrescar.addEventListener('click', () => {
 
 selectFuente.addEventListener('change', () => cargarPosts({ reiniciar: true }));
 checkNoLeidos.addEventListener('change', () => cargarPosts({ reiniciar: true }));
+checkFavoritos.addEventListener('change', () => cargarPosts({ reiniciar: true }));
 
 btnCargarMas.addEventListener('click', () => cargarPosts({ reiniciar: false }));
 

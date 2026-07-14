@@ -4,6 +4,7 @@
 -- MIGRACIÓN: si ya tenías la tabla `posts` creada de antes (sin la columna
 -- imagen_url), ejecuta primero esta línea suelta antes del resto del script:
 -- alter table posts add column if not exists imagen_url text;
+-- alter table posts add column if not exists favorito boolean not null default false;
 
 create table if not exists fuentes (
   id bigint generated always as identity primary key,
@@ -23,6 +24,7 @@ create table if not exists posts (
   resumen text,
   imagen_url text,
   leido boolean not null default false,
+  favorito boolean not null default false,
   creado_en timestamptz not null default now(),
   unique (fuente_id, url)
 );

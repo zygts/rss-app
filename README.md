@@ -42,6 +42,20 @@ Puedes seguir añadiendo fuentes nuevas en cualquier momento, sin tocar código.
   pusiste `CRON_SECRET`, esa llamada manual dará 401 — es normal, solo el
   cron interno de Vercel puede llamarla con el secreto).
 
+## Favoritos
+
+Cada post tiene un botón de estrella (★) junto al título para marcarlo o
+quitarlo de favoritos. En el sidebar hay una casilla "Solo favoritos" para
+filtrar y ver solo esos.
+
+**Si ya tenías el proyecto desplegado de antes**, la tabla `posts` no tiene
+la columna `favorito` todavía — ejecuta esto una vez en el SQL Editor de Neon
+(puedes hacerlo junto con el `alter table` de la sección anterior):
+
+```sql
+alter table posts add column if not exists favorito boolean not null default false;
+```
+
 ## Rellenar imágenes de posts ya guardados
 
 Si ya tenías posts guardados antes de añadir la columna `imagen_url`, puedes
@@ -87,7 +101,8 @@ api/
   check-feeds.js    → cron: recorre las fuentes (en paralelo), detecta posts nuevos, los guarda
   get-posts.js      → sirve los posts guardados al panel (con filtro por fuente, no-leídos y paginación)
   get-fuentes.js    → lista las fuentes para el desplegable de filtro + detecta fuentes con problemas
-  mark-read.js      → marca un post como leído
+  mark-read.js      → marca un post como leído o no leído
+  mark-favorite.js  → marca o desmarca un post como favorito
   mark-all-read.js  → marca todos los posts (o los de una fuente) como leídos
   backfill-imagenes.js → de un solo uso: rellena imagen_url en posts ya guardados que aún no la tengan
 lib/
