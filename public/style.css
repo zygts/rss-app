@@ -44,10 +44,21 @@ button {
 
 button:hover { opacity: 0.9; }
 
-main {
-  max-width: 720px;
+.layout {
+  max-width: 1100px;
   margin: 0 auto;
   padding: 1.5rem;
+  display: flex;
+  align-items: flex-start;
+  gap: 2rem;
+}
+
+.contenido {
+  flex: 1;
+  min-width: 0;
+}
+
+main {
   display: grid;
   gap: 1rem;
 }
@@ -101,20 +112,38 @@ main {
   font-size: 0.8rem;
 }
 
-/* --- Controles de filtro y aviso de fuentes --- */
+/* --- Sidebar de controles y aviso de fuentes --- */
 
 .controles {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 1.5rem;
+  width: 220px;
+  flex-shrink: 0;
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 1.25rem;
   display: flex;
-  align-items: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  padding-top: 1rem;
+  flex-direction: column;
+  gap: 1.25rem;
+  position: sticky;
+  top: 1.5rem;
+}
+
+.controles-grupo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+}
+
+.controles-etiqueta {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--muted);
 }
 
 .controles select {
+  width: 100%;
   padding: 0.4rem 0.6rem;
   border-radius: 6px;
   border: 1px solid var(--border);
@@ -133,21 +162,19 @@ main {
 
 .grupo-marcar-todos {
   display: flex;
+  flex-direction: column;
   gap: 0.5rem;
-  margin-left: auto;
-  flex-wrap: wrap;
 }
 
 button.secundario {
   background: transparent;
   color: var(--accent);
   border: 1px solid var(--accent);
+  width: 100%;
 }
 
 #aviso-fuentes {
-  max-width: 720px;
-  margin: 1rem auto 0 auto;
-  padding: 0 1.5rem;
+  margin-bottom: 1rem;
 }
 
 .aviso {
@@ -163,16 +190,44 @@ button.secundario {
 .aviso strong { font-weight: 600; }
 
 .paginacion {
-  max-width: 720px;
-  margin: 0 auto;
-  padding: 0 1.5rem 2rem 1.5rem;
   text-align: center;
+  padding: 1rem 0 2rem 0;
 }
 
 .paginacion button {
   background: var(--card);
   color: var(--accent);
   border: 1px solid var(--border);
+}
+
+/* En pantallas estrechas, el sidebar pasa a ir arriba en horizontal */
+@media (max-width: 700px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .controles {
+    width: 100%;
+    position: static;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .controles-grupo {
+    flex: 1;
+    min-width: 140px;
+  }
+
+  .grupo-marcar-todos {
+    flex-direction: row;
+    width: 100%;
+  }
+
+  button.secundario {
+    width: auto;
+    flex: 1;
+  }
 }
 
 .post-imagen {
